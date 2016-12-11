@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using inventory_api.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace inventory_api
 {
@@ -27,8 +29,15 @@ namespace inventory_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSwaggerGen();
             // Add framework services.
             services.AddMvc();
+            services.AddSingleton<IProductRepository, ProductRepository>();
+
+            var connectionString = Configuration["DbContextSettings:ConnectionString"];
+            services.AddDbContext<InventoryContext>(options 
+            => options.UseSqlServer(connectionString));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +47,8 @@ namespace inventory_api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUi();
         }
     }
 }
