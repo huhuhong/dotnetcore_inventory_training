@@ -42,9 +42,9 @@ namespace inventory_api.Controllers
         }
 
         [HttpPost]
-        public ProductDto Add([FromBody] ProductDto product)
+        public IActionResult Add([FromBody] ProductDto product)
         {
-            return this.productRepository.Add(product);
+            return new OkObjectResult(this.productRepository.Add(product));
         }
 
         [HttpDelete("all")]
