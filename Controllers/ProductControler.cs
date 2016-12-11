@@ -26,19 +26,19 @@ namespace inventory_api.Controllers
 
                 // GET api/product
         [HttpGet("{id}")]
-        public ProductDto Get(Guid id)
+        public IActionResult Get(Guid id)
         {
             Product product = this.context.Products.FirstOrDefault(i => i.Id == id);
             if(product != null){
-                return new ProductDto(){
+                return new OkObjectResult(new ProductDto(){
                     Id = product.Id,
                     Name = product.Name,
                     SellingPrice = product.SellingPrice,
                     CostPrice = product.CostPrice
-                };
+                });
             }
-
-            return null;
+            else
+                return new NotFoundResult();
         }
 
         [HttpPost]
