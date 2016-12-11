@@ -11,19 +11,72 @@ namespace inventory_api.Controllers
     public class ProductController : Controller
     {
         private IProductRepository productRepository;
-        public ProductController(IProductRepository productRepository){
+        private InventoryContext context;
+        public ProductController(IProductRepository productRepository, InventoryContext context)
+        {
             this.productRepository = productRepository;
+            this.context = context;
         }
         // GET api/product
         [HttpGet]
         public IEnumerable<ProductDto> Get()
         {
-           return this.productRepository.GetAll();
+            return this.productRepository.GetAll();
+        }
+
+                // GET api/product
+        [HttpGet("{id}")]
+        public ProductDto Get(Guid id)
+        {
+            Product product = this.context.Products.FirstOrDefault(i => i.Id == id);
+            if(product != null){
+                return new ProductDto(){
+                    Id = product.Id,
+                    Name = product.Name,
+                    SellingPrice = product.SellingPrice,
+                    CostPrice = product.CostPrice
+                };
+            }
+
+            return null;
         }
 
         [HttpPost]
-        public void Add([FromBody] ProductDto product){
-            this.productRepository.Add(product);
+        public ProductDto Add([FromBody] ProductDto product)
+        {
+            return this.productRepository.Add(product);
+        }
+
+        [HttpDelete("all")]
+        public void Delete()
+        {
+
+            foreach (var entity in context.Products)
+                context.Products.Remove(entity);
+            context.SaveChanges();
+
+            this.context.SaveChanges();
+        }
+
+        [HttpDelete("{id}")]
+        public void DeleteById(Guid id)
+        {
+                                Console.WriteLine(id);
+
+            Product product = this.context.Products
+            .FirstOrDefault(i=>i.Id == id);
+            if (product != null)
+            {
+                Console.WriteLine(product.Id);
+                this.context.Products.Remove(product);
+
+                this.context.SaveChanges();
+            }
+            else{
+                throw new Exception("Not Found");
+            }
+        
+
         }
     }
 }
